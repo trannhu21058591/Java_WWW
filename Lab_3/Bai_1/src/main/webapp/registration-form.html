@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Registration Form</title>
+    <style>
+        body {
+            background-color: #b3e0f2;
+            font-family: Arial, sans-serif;
+        }
+        form {
+
+            margin: 30px auto;
+            padding: 20px;
+            background: #e6f7ff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #aaa;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            margin-bottom: 10px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 250px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        textarea {
+            height: 60px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+            background-color: #fff;
+        }
+        table, th, td {
+            border: 1px solid #999;
+            text-align: center;
+            padding: 5px;
+        }
+        .hobbies, .course {
+            margin-top: 10px;
+        }
+        .submit-btn {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .submit-btn input {
+            padding: 8px 16px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<form action="registration-form" name="formDangKy" method="GET">
+    <h2 style="text-align:center;">Student Registration Form</h2>
+
+    <label>First Name:</label>
+    <input type="text" name="firstName" maxlength="30"><br>
+
+    <label>Last Name:</label>
+    <input type="text" name="lastName" maxlength="30"><br>
+
+    <label>Date of Birth:</label>
+    <input type="date" name="dateOfBirth"><br>
+
+    <label>Email:</label>
+    <input type="email" name="email"><br>
+
+    <label>Mobile Number:</label>
+    <input type="text" name="mobileNumber" maxlength="10"><br>
+
+    <label>Gender:</label>
+    <input type="radio" name="gender" value="male"> Male
+    <input type="radio" name="gender" value="female"> Female<br>
+
+    <label>Address:</label>
+    <textarea name="address"></textarea><br>
+
+    <label>City:</label>
+    <input type="text" name="city" maxlength="30"><br>
+
+    <label>Pin Code:</label>
+    <input type="text" name="pinCode" maxlength="6"><br>
+
+    <label>State:</label>
+    <input type="text" name="state" maxlength="30"><br>
+
+    <label>Country:</label>
+    <input type="text" name="country" value="India"><br>
+
+    <div class="hobbies">
+        <label>Hobbies:</label>
+        <input type="checkbox" name="hobbies" value="Drawing"> Drawing
+        <input type="checkbox" name="hobbies" value="Singing"> Singing
+        <input type="checkbox" name="hobbies" value="Dancing"> Dancing
+        <input type="checkbox" name="hobbies" value="Sketching"> Sketching
+        <input type="checkbox" name="hobbies" value="Others"> Others:
+        <input type="text" name="hobbyOther" maxlength="30">
+    </div>
+
+    <br><strong>Qualification:</strong>
+    <table>
+        <tr>
+            <th>Sl.No</th>
+            <th>Examination</th>
+            <th>Board</th>
+            <th>Percentage</th>
+            <th>Year of Passing</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Class X</td>
+            <td><input type="text" name="classXBoard" maxlength="10"></td>
+            <td><input type="text" name="classXPercent" maxlength="5"></td>
+            <td><input type="text" name="classXYear" maxlength="4"></td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Class XII</td>
+            <td><input type="text" name="classXIIBoard" maxlength="10"></td>
+            <td><input type="text" name="classXIIPercent" maxlength="5"></td>
+            <td><input type="text" name="classXIIYear" maxlength="4"></td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Graduation</td>
+            <td><input type="text" name="gradBoard" maxlength="10"></td>
+            <td><input type="text" name="gradPercent" maxlength="5"></td>
+            <td><input type="text" name="gradYear" maxlength="4"></td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Masters</td>
+            <td><input type="text" name="mastersBoard" maxlength="10"></td>
+            <td><input type="text" name="mastersPercent" maxlength="5"></td>
+            <td><input type="text" name="mastersYear" maxlength="4"></td>
+        </tr>
+    </table>
+
+    <div class="course">
+        <label>Course applies for:</label>
+        <input type="radio" name="course" value="BCA"> BCA
+        <input type="radio" name="course" value="B.Com"> B.Com
+        <input type="radio" name="course" value="B.Sc"> B.Sc
+        <input type="radio" name="course" value="B.A"> B.A
+    </div>
+
+    <div class="submit-btn">
+        <input type="submit" value="Submit">
+        <input type="reset" value="Reset">
+    </div>
+</form>
+
+</body>
+</html>
