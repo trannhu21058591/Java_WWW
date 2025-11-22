@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product != null ? product.name : 'Chi tiết Sản phẩm'}">Chi tiết Sản phẩm</title>
+    <th:block th:replace="~{views/components/Navbar :: navbar-style}"></th:block>
+    <th:block th:replace="~{views/components/Navbar :: navbar-script}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/product-detail.css}">
+</head>
+<body>
+    <!-- Include Navbar -->
+    <div th:replace="~{views/components/Navbar :: navbar}"></div>
+    
+    <div class="container-product-detail">
+        <div th:if="${error != null}" class="error-message">
+            <strong>Lỗi:</strong> <span th:text="${error}"></span>
+            <br><br>
+            <a th:href="@{/}" style="color: #1976d2; text-decoration: none;">← Quay lại trang chủ</a>
+        </div>
+
+        <div th:if="${product != null}">
+     
+            <div class="breadcrumb">
+                <a th:href="@{/}">Trang chủ</a> / 
+                <span th:if="${product.categoryName != null}" th:text="${product.categoryName}"></span>
+                <span th:if="${product.categoryName == null}">Sản phẩm</span> / 
+                <span th:text="${product.name}"></span>
+            </div>
+
+            <div class="product-detail-container">
+           
+                <div class="product-images">
+                    <img th:if="${product.imageURL != null && !product.imageURL.isEmpty()}" 
+                         th:src="${product.imageURL}" 
+                         th:alt="${product.name}"
+                         class="main-image"
+                         loading="lazy"
+                         onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="no-image-placeholder" style="display: none;">
+                        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Không có hình ảnh</span>
+                    </div>
+                    <div th:if="${product.imageURL == null || product.imageURL.isEmpty()}" class="no-image-placeholder">
+                        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Không có hình ảnh</span>
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="product-info">
+                    <div class="product-header">
+                        <div>
+                            <span th:if="${product.categoryName != null}" class="product-category-badge" th:text="${product.categoryName}"></span>
+                            <span th:if="${product.gender != null}" class="product-gender-badge" th:text="${product.gender}"></span>
+                        </div>
+                        <div class="product-brand" th:text="${product.brand}"></div>
+                        <h1 class="product-name" th:text="${product.name}"></h1>
+                        <div th:if="${product.modelNumber != null}" style="color: #999; font-size: 0.9em;">
+                            Mã sản phẩm: <span th:text="${product.modelNumber}"></span>
+                        </div>
+                    </div>
+
+                    <div class="product-price">
+                        <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')}"></span> đ
+                    </div>
+
+                    <div th:classappend="${product.stock > 10 ? 'in-stock' : (product.stock > 0 ? 'low-stock' : 'out-of-stock')}" 
+                         class="product-stock">
+                        <strong th:if="${product.stock > 10}">✓ Còn hàng</strong>
+                        <strong th:if="${product.stock > 0 && product.stock <= 10}">⚠ Sắp hết hàng</strong>
+                        <strong th:if="${product.stock == 0}">✗ Hết hàng</strong>
+                        <span th:if="${product.stock > 0}"> - Còn <span th:text="${product.stock}"></span> sản phẩm</span>
+                    </div>
+
+                    <div th:if="${product.description != null && !product.description.isEmpty()}" class="product-description">
+                        <h3 style="margin-bottom: 10px; color: #333;">Mô tả sản phẩm</h3>
+                        <div th:utext="${#strings.replace(#strings.replace(product.description, '\n', '&lt;br&gt;'), '\r', '')}"></div>
+                    </div>
+
+                    <div th:if="${product.material != null || product.movement != null || product.caseSize != null || product.waterResistance != null}" 
+                         class="product-specs">
+                        <h3>Thông số kỹ thuật</h3>
+                        <div th:if="${product.material != null}" class="spec-item">
+                            <span class="spec-label">Chất liệu:</span>
+                            <span class="spec-value" th:text="${product.material}"></span>
+                        </div>
+                        <div th:if="${product.movement != null}" class="spec-item">
+                            <span class="spec-label">Bộ máy:</span>
+                            <span class="spec-value" th:text="${product.movement}"></span>
+                        </div>
+                        <div th:if="${product.caseSize != null}" class="spec-item">
+                            <span class="spec-label">Kích thước vỏ:</span>
+                            <span class="spec-value" th:text="${product.caseSize}"></span>
+                        </div>
+                        <div th:if="${product.waterResistance != null}" class="spec-item">
+                            <span class="spec-label">Độ chống nước:</span>
+                            <span class="spec-value" th:text="${product.waterResistance}"></span>
+                        </div>
+                        <div th:if="${product.diaColor != null}" class="spec-item">
+                            <span class="spec-label">Màu mặt đồng hồ:</span>
+                            <span class="spec-value" th:text="${product.diaColor}"></span>
+                        </div>
+                        <div th:if="${product.strapColor != null}" class="spec-item">
+                            <span class="spec-label">Màu dây đeo:</span>
+                            <span class="spec-value" th:text="${product.strapColor}"></span>
+                        </div>
+                    </div>
+
+                    <div class="product-actions">
+                        <form th:if="${product.stock > 0}" th:action="@{/cart/add}" method="post" style="display: inline;">
+                            <input type="hidden" name="productId" th:value="${product.id}">
+                            <input type="hidden" name="quantity" value="1">
+                            <input type="hidden" name="redirectUrl" th:value="@{/products/{id}(id=${product.id})}">
+                            <button type="submit" class="btn-add-to-cart">
+                                Thêm vào giỏ hàng
+                            </button>
+                        </form>
+                        <button th:if="${product.stock == 0}" class="btn-add-to-cart" disabled>
+                            Hết hàng
+                        </button>
+                        <a th:href="@{/}" class="btn-buy-now" 
+                           th:if="${product.stock > 0}"
+                           th:onclick="'alert(\'Chức năng mua ngay đang được phát triển\'); return false;'">
+                            Mua ngay
+                        </a>
+                    </div>
+
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.9em;">
+                        <div th:if="${product.sold > 0}">Đã bán: <strong th:text="${product.sold}"></strong> sản phẩm</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

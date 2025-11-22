@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Navbar Component</title>
+</head>
+<body>
+    <!-- Navbar Fragment -->
+    <nav th:fragment="navbar" class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a th:href="@{/}">🛍️ ShopClock</a>
+            </div>
+            
+            <div class="navbar-menu">
+                <a th:href="@{/}" class="nav-link">Trang chủ</a>
+                <div class="nav-link-dropdown">
+                    <a href="#" class="nav-link" id="categoryLink">
+                        Danh mục
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dropdown-arrow-small">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </a>
+                    <div class="category-dropdown" id="categoryDropdown">
+                        <a th:each="category : ${categories}" 
+                           th:href="@{/(category=${category.id})}" 
+                           class="category-item"
+                           th:text="${category.name}">
+                            Danh mục
+                        </a>
+                        <div th:if="${categories == null || categories.isEmpty()}" class="category-item no-categories">
+                            Không có danh mục
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="nav-link">Liên hệ</a>
+                <a th:href="@{/cart}" class="nav-link cart-link">
+                    🛒 Giỏ hàng
+                </a>
+            </div>
+            
+            <div class="navbar-auth">
+                <!-- Nếu đã đăng nhập -->
+                <div th:if="${user != null}" class="user-menu">
+                    <div class="user-info" id="userInfo">
+                        <span class="user-name" th:text="${user.fullName}">Tên người dùng</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dropdown-arrow">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="#" class="dropdown-item">Thông tin cá nhân</a>
+                            <a href="#" class="dropdown-item">Đơn hàng</a>
+                            <a th:href="@{/logout}" class="dropdown-item">Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Nếu chưa đăng nhập -->
+                <div th:if="${user == null}" class="auth-buttons">
+                    <a th:href="@{/login}" class="btn-login">Đăng nhập</a>
+                    <a th:href="@{/register}" class="btn-register">Đăng ký</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <link th:fragment="navbar-style" rel="stylesheet" th:href="@{/css/navbar.css}">
+
+    <script th:fragment="navbar-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            const userInfo = document.getElementById('userInfo');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            if (userInfo && userDropdown) {
+                userInfo.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('show');
+                    userInfo.classList.toggle('active');
+                });
+                
+                document.addEventListener('click', function(e) {
+                    if (!userInfo.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                        userInfo.classList.remove('active');
+                    }
+                });
+                
+                const dropdownItems = userDropdown.querySelectorAll('.dropdown-item');
+                dropdownItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        if (!this.href.includes('/logout')) {
+                            userDropdown.classList.remove('show');
+                            userInfo.classList.remove('active');
+                        }
+                    });
+                });
+            }
+
+            const categoryLink = document.getElementById('categoryLink');
+            const categoryDropdown = document.getElementById('categoryDropdown');
+            const navLinkDropdown = categoryLink ? categoryLink.closest('.nav-link-dropdown') : null;
+            
+            if (categoryLink && categoryDropdown && navLinkDropdown) {
+                categoryLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    categoryDropdown.classList.toggle('show');
+                    navLinkDropdown.classList.toggle('active');
+                });
+                
+                document.addEventListener('click', function(e) {
+                    if (!navLinkDropdown.contains(e.target) && !categoryDropdown.contains(e.target)) {
+                        categoryDropdown.classList.remove('show');
+                        navLinkDropdown.classList.remove('active');
+                    }
+                });
+                
+                const categoryItems = categoryDropdown.querySelectorAll('.category-item');
+                categoryItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        categoryDropdown.classList.remove('show');
+                        navLinkDropdown.classList.remove('active');
+                    });
+                });
+            }
+        });
+    </script>
+    
+</body>
+</html>
+

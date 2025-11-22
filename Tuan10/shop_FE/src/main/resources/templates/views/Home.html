@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách Sản phẩm</title>
+    <th:block th:replace="~{views/components/Navbar :: navbar-style}"></th:block>
+    <th:block th:replace="~{views/components/Navbar :: navbar-script}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+    <!-- Thêm Navbar -->
+    <div th:replace="~{views/components/Navbar :: navbar}"></div>
+    
+    <div class="container">
+
+        <div th:if="${error != null}" class="error-message">
+            <strong>Lỗi:</strong> <span th:text="${error}"></span>
+        </div>
+
+        <div th:if="${products != null && !products.isEmpty()}" class="products-grid">
+            <div th:each="product : ${products}" class="product-card">
+                <a th:href="@{/products/{id}(id=${product.id})}" style="text-decoration: none; color: inherit;">
+                    <div class="product-image">
+                    
+                    <img th:if="${product.imageURL != null && !product.imageURL.isEmpty()}" 
+                         th:src="${product.imageURL}" 
+                         th:alt="${product.name != null ? product.name : 'Sản phẩm'}"
+                         loading="lazy"
+                         onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                   
+                    <div class="no-image-placeholder" style="display: none;">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Không có hình ảnh</span>
+                    </div>
+                    
+                    <div th:if="${product.imageURL == null || product.imageURL.isEmpty()}" class="no-image-placeholder">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Không có hình ảnh</span>
+                    </div>
+                    </div>
+                </a>
+                <div class="product-info">
+                    <div>
+                        <span th:if="${product.categoryName != null}" class="product-category" th:text="${product.categoryName}"></span>
+                        <span th:if="${product.gender != null}" class="product-gender" th:text="${product.gender}"></span>
+                    </div>
+                    <div class="product-brand" th:text="${product.brand}"></div>
+                    <a th:href="@{/products/{id}(id=${product.id})}" style="text-decoration: none; color: inherit;">
+                        <div class="product-name" th:text="${product.name}" style="cursor: pointer;"></div>
+                    </a>
+                    <div class="product-description" th:text="${product.description}"></div>
+                    <div class="product-stock"
+                         th:classappend="${product.stock == 0} ? 'out' : (${product.stock < 10} ? 'low' : '')"
+                         th:text="${product.stock == 0} ? 'Hết hàng' : ('Còn ' + ${product.stock} + ' sản phẩm')">
+                    </div>
+                    <div class="product-footer">
+                        <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></div>
+                        <div class="product-actions-footer">
+                            <button th:if="${product.stock > 0}" 
+                                    class="btn-add-cart-quick" 
+                                    th:data-product-id="${product.id}"
+                                    onclick="addToCart(this)">
+                                +
+                            </button>
+                            <button th:if="${product.stock == 0}" 
+                                    class="btn-add-cart-quick" 
+                                    disabled>
+                                +
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${products == null || products.isEmpty()}" class="empty-state">
+            <h2>Không có sản phẩm nào</h2>
+            <p>Hiện tại không có sản phẩm nào trong hệ thống.</p>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const backendApiUrl = /*[[${@environment.getProperty('backend.api.url')}]]*/ 'http://localhost:8080';
+        const authToken = /*[[${authToken}]]*/ null;
+        
+        function addToCart(button) {
+            const productId = button.getAttribute('data-product-id');
+            const quantity = 1;
+            
+            // Disable button để tránh double click
+            button.disabled = true;
+            button.textContent = '...';
+            
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            
+            // Thêm Authorization header nếu có token
+            if (authToken) {
+                headers['Authorization'] = 'Bearer ' + authToken;
+            }
+            
+            // Gọi frontend endpoint để tránh mất session
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: headers,
+                credentials: 'include', // Quan trọng: gửi cookie
+                body: JSON.stringify({
+                    productId: parseInt(productId),
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Hiển thị thông báo thành công
+                    showNotification('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+                } else {
+                    showNotification(data.message || 'Lỗi khi thêm vào giỏ hàng', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Lỗi khi thêm vào giỏ hàng: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Re-enable button
+                button.disabled = false;
+                button.textContent = '+';
+            });
+        }
+        
+        function showNotification(message, type) {
+            // Tạo notification element
+            const notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 15px 20px;
+                background-color: ${type === 'success' ? '#4caf50' : '#f44336'};
+                color: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Tự động xóa sau 3 giây
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Thêm CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
